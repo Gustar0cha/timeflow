@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Flow - Sistema de Gerenciamento de Tempo de Separação</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="app-title">
+                <img src="..assets/images/timeflow-logo.png" alt="Time Flow Logo" class="app-logo">
+                <h1>Time Flow</h1>
+            </div>
+            <div>
+                <label for="user-select">Operador:</label>
+                <select id="user-select" class="user-select">
+                    <!-- Os usuários serão carregados aqui -->
+                </select>
+            </div>
+        </header>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="new-order">Novo Pedido</button>
+            <button class="tab-btn" data-tab="order-history">Histórico</button>
+            <button class="tab-btn" data-tab="printer-orders">Pedidos Impressora</button>
+            <button class="tab-btn" data-tab="statistics">Estatísticas</button>
+            <button class="tab-btn" data-tab="settings">Configurações</button>
+        </div>
+        
+        <!-- Tab: Novo Pedido -->
+        <div id="new-order" class="tab-content active">
+    <div class="card">
+        <h2>Registrar Novo Pedido</h2>
+        <div class="form-group">
+            <label for="order-id">Número do Pedido:</label>
+            <input type="text" id="order-id" class="form-control" placeholder="Ex: #12345">
+        </div>
+        <div class="form-group">
+            <label for="order-items">Número de Itens:</label>
+            <input type="number" id="order-items" class="form-control" min="1" value="1">
+        </div>
+        <div class="form-group">
+            <label for="order-notes">Observações:</label>
+            <textarea id="order-notes" class="form-control" rows="3" placeholder="Observações adicionais sobre o pedido..."></textarea>
+        </div>
+        <button id="start-timer" class="btn btn-primary">Iniciar Separação</button>
+    </div>
+    
+    <!-- Container para pedidos ativos -->
+    <div id="active-orders-container"></div>
+    
+    <!-- Template original (escondido) -->
+    <div id="active-order" class="card" style="display: none;">
+        <h2>Pedido em Separação: <span id="active-order-id"></span></h2>
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <div class="timer-controls">
+            <button id="pause-timer" class="btn btn-warning">Pausar</button>
+            <button id="resume-timer" class="btn btn-primary" style="display: none;">Retomar</button>
+            <button id="complete-timer" class="btn btn-success">Finalizar Separação</button>
+            <button id="cancel-timer" class="btn btn-danger">Cancelar</button>
+        </div>
+        <div class="form-group">
+            <label for="completion-notes">Notas de Finalização:</label>
+            <textarea id="completion-notes" class="form-control" rows="2" placeholder="Alguma observação sobre a separação..."></textarea>
+        </div>
+    </div>
+</div>
+        
+        <!-- Tab: Histórico -->
+        <div id="order-history" class="tab-content">
+            <div class="card">
+                <h2>Histórico de Pedidos</h2>
+                <div class="filter-container">
+                    <input type="text" id="search-orders" class="form-control" placeholder="Buscar por número de pedido">
+                    <select id="filter-status" class="form-control">
+                        <option value="all">Todos</option>
+                        <option value="completed">Finalizados</option>
+                        <option value="canceled">Cancelados</option>
+                    </select>
+                    <select id="filter-user" class="form-control">
+                        <option value="all">Todos Operadores</option>
+                        <!-- Os usuários serão carregados aqui -->
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Nº Pedido</th>
+                                <th>Itens</th>
+                                <th>Prioridade</th>
+                                <th>Início</th>
+                                <th>Duração</th>
+                                <th>Operador</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <!-- Os pedidos serão carregados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Pedidos Impressora -->
+        <div id="printer-orders" class="tab-content">
+            <div class="card">
+                <h2>Pedidos da Impressora</h2>
+                <p class="subtitle">Pedidos capturados do log da impressora</p>
+                
+                <div class="printer-controls">
+                    <div class="form-group">
+                        <label for="printer-log-file">Importar log da impressora:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="file" id="printer-log-file" class="form-control" accept=".txt,.log,.csv">
+                            <button id="import-log" class="btn btn-primary">Importar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="monitoring-section">
+                        <h3>Monitoramento Automático</h3>
+                        <div class="form-group">
+                            <label for="printer-directory">Diretório de logs da impressora:</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" id="printer-directory" class="form-control" placeholder="Ex: C:\Logs\Impressora">
+                                <button id="browse-directory" class="btn btn-secondary">Procurar...</button>
+                            </div>
+                            <div class="form-check" style="margin-top: 10px;">
+                                <input type="checkbox" id="auto-monitoring" class="form-check-input">
+                                <label for="auto-monitoring" class="form-check-label">Ativar monitoramento automático</label>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label for="monitoring-interval">Intervalo de verificação:</label>
+                                <select id="monitoring-interval" class="form-control">
+                                    <option value="5">A cada 5 segundos</option>
+                                    <option value="15">A cada 15 segundos</option>
+                                    <option value="30" selected>A cada 30 segundos</option>
+                                    <option value="60">A cada 1 minuto</option>
+                                    <option value="300">A cada 5 minutos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="monitoring-status">
+                            <p>Status: <span id="monitoring-status-text">Inativo</span></p>
+                            <div id="monitoring-indicator" style="display: none;">
+                                <div class="loading-indicator"></div>
+                                <span>Monitorando logs...</span>
+                            </div>
+                        </div>
+                        <button id="save-monitoring" class="btn btn-primary" style="margin-top: 10px;">Salvar Configurações</button>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="refresh-interval">Atualização automática (simulação):</label>
+                        <select id="refresh-interval" class="form-control">
+                            <option value="0">Desativada</option>
+                            <option value="30">A cada 30 segundos</option>
+                            <option value="60">A cada 1 minuto</option>
+                            <option value="300">A cada 5 minutos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="last-update" style="text-align: right; margin-top: 10px; font-size: 0.9em; color: var(--text-secondary);">
+                        Última atualização: <span id="last-update-time">Nunca</span>
+                    </div>
+                </div>
+                
+                <div class="printer-filters" style="display: flex; gap: 10px; margin: 20px 0;">
+                    <input type="text" id="search-printer-orders" class="form-control" placeholder="Buscar por número de pedido">
+                    <select id="printer-order-status" class="form-control">
+                        <option value="all">Todos os Status</option>
+                        <option value="pending">Pendentes</option>
+                        <option value="processing">Em processamento</option>
+                        <option value="completed">Concluídos</option>
+                    </select>
+                </div>
+                
+                <div class="printer-orders-container">
+                    <table class="table" id="printer-orders-table">
+                        <thead>
+                            <tr>
+                                <th>Nº Pedido</th>
+                                <th>Hora Impressão</th>
+                                <th>Itens</th>
+                                <th>Origem</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="printer-orders-tbody">
+                            <!-- Os pedidos da impressora serão carregados aqui -->
+                            <tr class="no-orders-row">
+                                <td colspan="6" style="text-align: center; padding: 30px;">
+                                    Nenhum pedido encontrado. Importe um log da impressora para começar.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Estatísticas -->
+        <div id="statistics" class="tab-content">
+            <div class="card">
+                <h2>Estatísticas de Desempenho</h2>
+                <div class="filter-container">
+                    <select id="stats-period" class="form-control">
+                        <option value="day">Hoje</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mês</option>
+                        <option value="all">Todos</option>
+                    </select>
+                    <select id="stats-user" class="form-control">
+                        <option value="all">Todos Operadores</option>
+                        <!-- Os usuários serão carregados aqui -->
+                    </select>
+                </div>
+                <div class="stats-summary">
+                    <div class="row" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <div class="stats-card">
+                            <h3>Total de Pedidos</h3>
+                            <p id="total-orders">0</p>
+                        </div>
+                        <div class="stats-card">
+                            <h3>Tempo Médio</h3>
+                            <p id="average-time">00:00:00</p>
+                        </div>
+                        <div class="stats-card">
+                            <h3>Pedidos/Hora</h3>
+                            <p id="orders-per-hour">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primeiro Gráfico: Tempo por Dia -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Tempo Médio e Quantidade por Dia</h3>
+                    <div class="chart-container">
+                        <canvas id="times-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Segundo Gráfico: Desempenho por Operador -->
+                <div class="card">
+                    <h3>Comparativo por Operador</h3>
+                    <div class="chart-container">
+                        <canvas id="operator-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Configurações -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <h2>Configurações</h2>
+                <div class="form-group">
+                    <label for="add-user">Adicionar Novo Operador:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="add-user" class="form-control" placeholder="Nome do operador">
+                        <button id="save-user" class="btn btn-primary">Adicionar</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h3>Operadores Registrados</h3>
+                    <ul id="users-list" style="list-style: none; margin-top: 10px;">
+                        <!-- Os usuários serão carregados aqui -->
+                    </ul>
+                </div>
+                <hr style="margin: 20px 0;">
+                <div class="form-group">
+                    <h3>Exportar Dados</h3>
+                    <button id="export-data" class="btn btn-primary">Exportar para CSV</button>
+                </div>
+                <div class="form-group">
+                    <h3>Limpar Dados</h3>
+                    <button id="clear-data" class="btn btn-danger">Limpar Todos os Dados</button>
+                    <p style="margin-top: 5px; color: #999;">Esta ação não pode ser desfeita.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer style="text-align: center; margin-top: 30px; padding: 20px; color: #777; font-size: 0.9rem;">
+            <p>Time Flow - Sistema de Gerenciamento de Tempo de Separação v1.0</p>
+            <p>&copy; 2025 Gustavo Rocha. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Flow - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/login-styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <img src="assets/images/timeflow-logo.png" alt="Time Flow Logo" class="login-logo">
+                <h1>Time Flow</h1>
+                <p class="login-subtitle">Sistema de Gerenciamento de Tempo de Separação</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">Usuário:</label>
+                    <input type="text" id="username" name="username" placeholder="Digite seu nome de usuário" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                </div>
+                
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Lembrar usuário</label>
+                    </div>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+                
+                <button type="submit" id="login-button" class="login-button">Entrar</button>
+            </div>
+            
+            <div class="login-footer">
+                <p>Não tem uma conta? <a href="#" id="register-link">Solicitar acesso</a></p>
+            </div>
+        </div>
+        
+        <footer class="login-page-footer">
+            <p>Time Flow - Sistema de Gerenciamento de Tempo de Separação v1.0</p>
+            <p>&copy; 2025 Gustavo Rocha. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Solicitar Acesso</h2>
+            <div class="form-group">
+                <label for="register-name">Nome Completo:</label>
+                <input type="text" id="register-name" name="register-name" required>
+            </div>
+            <div class="form-group">
+                <label for="register-email">E-mail:</label>
+                <input type="email" id="register-email" name="register-email" required>
+            </div>
+            <div class="form-group">
+                <label for="register-role">Função:</label>
+                <input type="text" id="register-role" name="register-role" required>
+            </div>
+            <div class="form-group">
+                <label for="register-message">Mensagem (opcional):</label>
+                <textarea id="register-message" name="register-message" rows="3"></textarea>
+            </div>
+            <button type="submit" class="submit-request-button">Enviar Solicitação</button>
+        </div>
+    </div>
+
+    <script src="../assets/js/login-script.js"></script>
+</body>
+</html>
